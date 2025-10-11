@@ -1,14 +1,17 @@
 import tensorflow as tf
 import cv2
 import numpy as np
+from tensorflow.keras.models import load_model
+from tensorflow.keras.layers import Softmax
 
-cls_model = tf.keras.models.load_model("models/all-in-one.h5", compile=False)
-fract_model = tf.keras.models.load_model("models/fracture.h5", compile=False)
-brain_model = tf.keras.models.load_model("models/brain.h5", compile=False)
-chest_model = tf.keras.models.load_model("models/chest.h5", compile=False)
-eye_model = tf.keras.models.load_model("models/eye.h5", compile=False)
-kid_model = tf.keras.models.load_model("models/kidney.h5", compile=False)
-skin_model = tf.keras.models.load_model("models/skin.h5", compile=False)
+# Load models with custom objects for compatibility
+cls_model = load_model("models/all-in-one.h5", compile=False, custom_objects={'Softmax': Softmax})
+fract_model = load_model("models/fracture.h5", compile=False, custom_objects={'Softmax': Softmax})
+brain_model = load_model("models/brain.h5", compile=False, custom_objects={'Softmax': Softmax})
+chest_model = load_model("models/chest.h5", compile=False, custom_objects={'Softmax': Softmax})
+eye_model = load_model("models/eye.h5", compile=False, custom_objects={'Softmax': Softmax})
+kid_model = load_model("models/kidney.h5", compile=False, custom_objects={'Softmax': Softmax})
+skin_model = load_model("models/skin.h5", compile=False, custom_objects={'Softmax': Softmax})
 
 def classify(img):
     im = cv2.resize(img, (52, 52))
