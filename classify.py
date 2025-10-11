@@ -125,27 +125,33 @@ def skin_net(img):
     ][np.argmax(result)]
 
 def bone_net(img):
-    result = fract_model.predict(np.array([img]))
+    model = get_fract_model()
+    result = model.predict(np.array([img]))
     return ['not fractured', 'fractured'][np.argmax(result)]
 
 def brain_net(img):
-    result = brain_model.predict(np.array([img]))
+    model = get_brain_model()
+    result = model.predict(np.array([img]))
     return ['pituitary', 'notumor', 'meningioma', 'glioma'][np.argmax(result)]
 
 def chest_net(img):
-    result = chest_model.predict(np.array([img]))
+    model = get_chest_model()
+    result = model.predict(np.array([img]))
     return ['PNEUMONIA', 'NORMAL'][np.argmax(result)]
 
 def eye_net(img):
-    result = eye_model.predict(np.array([img]))
+    model = get_eye_model()
+    result = model.predict(np.array([img]))
     return ['glaucoma', 'normal', 'diabetic_retinopathy', 'cataract'][np.argmax(result)]
 
 def kidney_net(img):
-    result = kid_model.predict(np.array([img]))
+    model = get_kid_model()
+    result = model.predict(np.array([img]))
     return ['Cyst', 'Tumor', 'Stone', 'Normal'][np.argmax(result)]
 
 def skin_net(img):
-    result = skin_model.predict(np.array([img]))
+    model = get_skin_model()
+    result = model.predict(np.array([img]))
     return [
         'pigmented benign keratosis', 'melanoma', 'vascular lesion',
         'actinic keratosis', 'squamous cell carcinoma', 'basal cell carcinoma',
