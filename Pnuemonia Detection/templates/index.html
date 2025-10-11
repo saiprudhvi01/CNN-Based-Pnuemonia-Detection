@@ -1,0 +1,48 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    <div class="upload-section">
+        <div class="upload-header">
+            <h2>Chest X-Ray Analysis</h2>
+            <p>Upload a chest X-ray image for AI-powered pneumonia detection</p>
+        </div>
+
+        <form action="{{ url_for('predict') }}" method="post" enctype="multipart/form-data" class="upload-form">
+            <div class="file-input-wrapper">
+                <input type="file" name="file" id="file-input" accept="image/*" required>
+                <label for="file-input" class="file-input-label">
+                    <span class="upload-icon">📷</span>
+                    <span class="upload-text">Choose Chest X-Ray Image</span>
+                </label>
+            </div>
+            <button type="submit" class="analyze-btn">
+                <span class="btn-icon">🔍</span>
+                Analyze Image
+            </button>
+        </form>
+    </div>
+
+    {% if prediction %}
+    <div class="result-container">
+        <div class="result-header">
+            <h3>Detection Result</h3>
+        </div>
+        <div class="result-content">
+            <p class="prediction-text">{{ prediction }}</p>
+        </div>
+    </div>
+    {% endif %}
+
+    <div class="info-section">
+        <div class="info-card">
+            <h4>How It Works</h4>
+            <p>Our advanced deep learning model analyzes chest X-ray images to detect signs of pneumonia with high accuracy.</p>
+        </div>
+        <div class="info-card">
+            <h4>Quick & Accurate</h4>
+            <p>Get instant results with our AI-powered analysis system trained on thousands of medical images.</p>
+        </div>
+    </div>
+</div>
+{% endblock %}

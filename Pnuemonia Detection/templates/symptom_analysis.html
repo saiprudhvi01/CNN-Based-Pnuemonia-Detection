@@ -1,0 +1,324 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="form-container">
+    {% if not severity_score %}
+    <!-- Symptom Analysis Form -->
+    <div class="analysis-section">
+        <div class="section-header">
+            <h2>Symptom-Based Analysis</h2>
+            <p>Enter your symptoms and risk factors for AI-powered pneumonia risk assessment</p>
+        </div>
+
+        <form method="POST" class="symptom-form">
+            <!-- Symptoms Section -->
+            <div class="form-section">
+                <h3>Current Symptoms</h3>
+                <div class="symptom-grid">
+                    {% for symptom, config in {
+                        'fever': {'label': 'Fever (°C)', 'placeholder': 'e.g., 38.5', 'type': 'number', 'step': '0.1'},
+                        'cough': {'label': 'Cough Duration (days)', 'placeholder': 'e.g., 5', 'type': 'number', 'step': '1'},
+                        'chest_pain': {'label': 'Chest Pain Severity (1-10)', 'placeholder': 'e.g., 7', 'type': 'number', 'step': '1', 'min': '1', 'max': '10'},
+                        'shortness_of_breath': {'label': 'Shortness of Breath (1-10)', 'placeholder': 'e.g., 6', 'type': 'number', 'step': '1', 'min': '1', 'max': '10'},
+                        'fatigue': {'label': 'Fatigue Level (1-10)', 'placeholder': 'e.g., 8', 'type': 'number', 'step': '1', 'min': '1', 'max': '10'},
+                        'sputum': {'label': 'Sputum/Mucus Production (1-10)', 'placeholder': 'e.g., 4', 'type': 'number', 'step': '1', 'min': '1', 'max': '10'}
+                    }.items() %}
+                    <div class="symptom-item">
+                        <label for="{{ symptom }}_value">{{ config.label }}</label>
+                        <input type="{{ config.type }}" name="{{ symptom }}_value" id="{{ symptom }}_value"
+                               placeholder="{{ config.placeholder }}" step="{{ config.step }}"
+                               {% if config.min %}min="{{ config.min }}"{% endif %}
+                               {% if config.max %}max="{{ config.max }}"{% endif %}>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Risk Factors Section -->
+            <div class="form-section">
+                <h3>Risk Factors</h3>
+                <div class="risk-factors">
+                    {% for factor, weight in {
+                        'smoking': 'Current or former smoker',
+                        'age_over_65': 'Age 65 or older',
+                        'chronic_disease': 'Chronic health conditions (diabetes, heart disease, etc.)',
+                        'weakened_immune': 'Weakened immune system',
+                        'recent_viral': 'Recent viral infection (flu, COVID-19, etc.)',
+                        'poor_nutrition': 'Poor nutrition or malnutrition'
+                    }.items() %}
+                    <div class="risk-factor">
+                        <input type="checkbox" name="{{ factor }}" id="{{ factor }}">
+                        <label for="{{ factor }}">{{ weight }}</label>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <button type="submit" class="analyze-btn">
+                <span class="btn-icon">🔍</span>
+                Analyze Symptoms
+            </button>
+        </form>
+    </div>
+
+    {% else %}
+    <!-- Results Display -->
+    <div class="results-section">
+        <div class="severity-assessment">
+            <h2>Risk Assessment Results</h2>
+            <div class="severity-meter">
+                <div class="severity-bar" style="width: {{ (severity_score * 100) }}%"></div>
+            </div>
+            <div class="severity-text">
+                <h3>Risk Level: {{ risk_assessment }}</h3>
+                <p>{{ "%.1f"|format(severity_score * 100) }}% Pneumonia Probability</p>
+            </div>
+        </div>
+
+        <!-- Causal AI Visualization -->
+        <div class="causal-analysis">
+            <h3>Feature Importance Analysis</h3>
+            <div class="importance-chart">
+                {% for feature, importance in feature_importance.items() %}
+                {% if importance > 0 %}
+                <div class="importance-item">
+                    <div class="importance-label">{{ feature.replace('_', ' ').title() }}</div>
+                    <div class="importance-bar-container">
+                        <div class="importance-bar" style="width: {{ (importance * 100) }}%; background: linear-gradient(90deg, #667eea {{ (importance * 100)|round }}%, #764ba2 {{ (importance * 100)|round }}%);">
+                            {{ "%.1f"|format(importance * 100) }}%
+                        </div>
+                    </div>
+                </div>
+                {% endif %}
+                {% endfor %}
+            </div>
+        </div>
+
+        <!-- Dynamic Explanation -->
+        <div class="explanation-section">
+            <h3>Medical Explanation</h3>
+            <div class="explanation-box">
+                <p>{{ explanation }}</p>
+            </div>
+        </div>
+
+        <div class="action-buttons">
+            <a href="{{ url_for('symptom_analysis') }}" class="btn-secondary">New Analysis</a>
+            <a href="{{ url_for('home') }}" class="btn-primary">Image Analysis</a>
+        </div>
+    </div>
+    {% endif %}
+</div>
+{% endblock %}
+
+<style>
+.analysis-section, .results-section {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 20px;
+    padding: 40px;
+    max-width: 800px;
+    margin: 20px auto;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.section-header h2 {
+    font-size: 1.8rem;
+    color: #2d3748;
+    margin-bottom: 8px;
+}
+
+.section-header p {
+    color: #718096;
+    margin-bottom: 30px;
+}
+
+.form-section {
+    margin-bottom: 40px;
+}
+
+.form-section h3 {
+    font-size: 1.3rem;
+    color: #4a5568;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+    border-bottom: 2px solid #e2e8f0;
+}
+
+.symptom-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
+}
+
+.symptom-item {
+    display: flex;
+    flex-direction: column;
+}
+
+.symptom-item label {
+    font-weight: 500;
+    color: #4a5568;
+    margin-bottom: 8px;
+}
+
+.symptom-item input {
+    padding: 12px;
+    border: 2px solid #e2e8f0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.symptom-item input:focus {
+    outline: none;
+    border-color: #667eea;
+}
+
+.risk-factors {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 15px;
+}
+
+.risk-factor {
+    display: flex;
+    align-items: center;
+    padding: 15px;
+    background: #f7fafc;
+    border-radius: 8px;
+    border: 2px solid #e2e8f0;
+}
+
+.risk-factor input[type="checkbox"] {
+    margin-right: 12px;
+    width: 18px;
+    height: 18px;
+    accent-color: #667eea;
+}
+
+.risk-factor label {
+    font-size: 0.95rem;
+    color: #4a5568;
+    cursor: pointer;
+}
+
+.severity-assessment {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.severity-meter {
+    width: 100%;
+    height: 20px;
+    background: #edf2f7;
+    border-radius: 10px;
+    overflow: hidden;
+    margin: 20px 0;
+}
+
+.severity-bar {
+    height: 100%;
+    background: linear-gradient(90deg, #48bb78, #ed8936, #f56565);
+    transition: width 0.8s ease;
+    border-radius: 10px;
+}
+
+.severity-text h3 {
+    font-size: 1.5rem;
+    margin-bottom: 10px;
+}
+
+.severity-text p {
+    color: #718096;
+    font-size: 1.1rem;
+}
+
+.causal-analysis {
+    margin-bottom: 40px;
+}
+
+.importance-chart {
+    background: #f7fafc;
+    border-radius: 12px;
+    padding: 25px;
+}
+
+.importance-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.importance-label {
+    min-width: 150px;
+    font-weight: 500;
+    color: #4a5568;
+}
+
+.importance-bar-container {
+    flex: 1;
+    margin-left: 20px;
+}
+
+.importance-bar {
+    height: 25px;
+    border-radius: 12px;
+    display: flex;
+    align-items: center;
+    padding: 0 15px;
+    color: white;
+    font-size: 0.8rem;
+    font-weight: 600;
+}
+
+.explanation-section {
+    margin-bottom: 40px;
+}
+
+.explanation-box {
+    background: linear-gradient(135deg, #667eea15, #764ba215);
+    border: 1px solid #667eea30;
+    border-radius: 12px;
+    padding: 25px;
+    line-height: 1.7;
+}
+
+.action-buttons {
+    display: flex;
+    gap: 15px;
+    justify-content: center;
+}
+
+.btn-secondary, .btn-primary {
+    padding: 12px 25px;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary {
+    background: #f7fafc;
+    color: #4a5568;
+    border: 2px solid #e2e8f0;
+}
+
+.btn-secondary:hover {
+    background: #edf2f7;
+    border-color: #cbd5e0;
+}
+
+.btn-primary {
+    background: linear-gradient(135deg, #667eea, #764ba2);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(102, 126, 234, 0.3);
+}
+</style>

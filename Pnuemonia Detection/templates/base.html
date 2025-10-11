@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pneumonia Detection AI - MediVisionX</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/styles.css') }}">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Header with medical branding and navigation -->
+    <header class="header">
+        <div class="header-overlay">
+            <h1>Pneumonia Detection AI</h1>
+            <p>Advanced AI-powered chest X-ray analysis for rapid pneumonia diagnosis</p>
+
+            <!-- Compact Navigation in Header -->
+            <nav class="header-navigation">
+                <a href="{{ url_for('home') }}" class="header-nav-btn {% if request.path == '/' %}active{% endif %}">
+                    <span class="nav-icon">📷</span>
+                    <span class="nav-text">Image Analysis</span>
+                </a>
+                <a href="{{ url_for('symptom_analysis') }}" class="header-nav-btn {% if '/symptom_analysis' in request.path %}active{% endif %}">
+                    <span class="nav-icon">🔍</span>
+                    <span class="nav-text">Symptom Analysis</span>
+                </a>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="container">
+        {% block content %}{% endblock %}
+    </main>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="footer-content">
+            <p>&copy; 2025 MediVisionX - Pneumonia Detection System</p>
+            <p>Powered by <span class="tech">Deep Learning</span> & <span class="tech">Medical AI</span></p>
+            <p class="disclaimer">For research and educational purposes only. Not intended for clinical diagnosis.</p>
+        </div>
+    </footer>
+</body>
+</html>
