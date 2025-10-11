@@ -319,6 +319,8 @@ def predict():
         except UnidentifiedImageError:
             return "Bad Request: Invalid image file. Please upload a valid image.", 400
         except Exception as e:
+            # Log the specific error for debugging
+            print(f"Prediction error: {str(e)}")
             return f"Error during prediction: {str(e)}", 500
 
         return render_template('index.html', prediction=prediction)
