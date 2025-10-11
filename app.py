@@ -304,25 +304,28 @@ def calculate_pneumonia_assessment(responses):
         'disclaimer': "This is a screening tool only, not a medical diagnosis. Always consult healthcare professionals for proper evaluation."
     }
 
-@app.route('/predict', methods=['POST'])
+@app.route('/predict', methods=['GET', 'POST'])
 def predict():
-    if 'file' not in request.files:
-        return redirect(url_for('home', error="No file part in the request."))
+    if request.method == 'POST':
+        if 'file' not in request.files:
+            return redirect(url_for('home', error="No file part in the request."))
 
-    file = request.files['file']
-    if file.filename == '':
-        return redirect(url_for('home', error="No selected file."))
+        file = request.files['file']
+        if file.filename == '':
+            return redirect(url_for('home', error="No selected file."))
 
-    try:
-        img = Image.open(file.stream).convert('RGB')
-        img_array = np.array(img)
-        prediction = classify(img_array)
-    except UnidentifiedImageError:
-        return redirect(url_for('home', error="Invalid image file. Please upload a valid image."))
-    except Exception as e:
-        return redirect(url_for('home', error="An error occurred during prediction."))
+        try:
+            img = Image.open(file.stream).convert('RGB')
+            img_array = np.array(img)
+            prediction = classify(img_array)
+        except UnidentifiedImageError:
+            return redirect(url_for('home', error="Invalid image file. Please upload a valid image."))
+        except Exception as e:
+            return redirect(url_for('home', error="An error occurred during prediction."))
 
-    return render_template('index.html', prediction=prediction)
+        return render_template('index.html', prediction=prediction)
+    
+    return render_template('index.html')
 
 def calculate_pneumonia_severity(symptoms, risk_factors):
     """Calculate pneumonia severity based on symptoms and risk factors"""
