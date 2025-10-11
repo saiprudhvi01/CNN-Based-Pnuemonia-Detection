@@ -307,21 +307,19 @@ def calculate_pneumonia_assessment(responses):
 @app.route('/predict', methods=['GET', 'POST'])
 def predict():
     if request.method == 'POST':
-        if 'file' not in request.files:
-            return redirect(url_for('home', error="No file part in the request."))
+        if 'file' not in request.files or request.files['file'].filename == '':
+            return "Bad Request: Please select a file to upload.", 400
 
         file = request.files['file']
-        if file.filename == '':
-            return redirect(url_for('home', error="No selected file."))
 
         try:
             img = Image.open(file.stream).convert('RGB')
             img_array = np.array(img)
             prediction = classify(img_array)
         except UnidentifiedImageError:
-            return redirect(url_for('home', error="Invalid image file. Please upload a valid image."))
+            return "Bad Request: Invalid image file. Please upload a valid image.", 400
         except Exception as e:
-            return redirect(url_for('home', error="An error occurred during prediction."))
+            return f"Error during prediction: {str(e)}", 500
 
         return render_template('index.html', prediction=prediction)
     
