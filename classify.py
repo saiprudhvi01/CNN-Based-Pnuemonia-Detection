@@ -8,8 +8,14 @@ from tensorflow.keras.layers import Softmax
 _models = {}
 
 def _load_model(model_name):
-    if model_name not in _models:
-        _models[model_name] = load_model(f"models/{model_name}.h5", compile=False, custom_objects={'Softmax': Softmax})
+    try:
+        model = load_model(f"models/{model_name}.h5", compile=False, custom_objects={'Softmax': Softmax})
+        if model is None:
+            raise ValueError(f"Model {model_name} loaded as None")
+        _models[model_name] = model
+    except Exception as e:
+        print(f"Error loading model {model_name}: {str(e)}")
+        raise
     return _models[model_name]
 
 # Load models lazily
