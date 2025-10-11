@@ -150,10 +150,3 @@ def kidney_net(img):
     return ['Cyst', 'Tumor', 'Stone', 'Normal'][np.argmax(result)]
 
 def skin_net(img):
-    model = get_skin_model()
-    result = model.predict(np.array([img]))
-    return [
-        'pigmented benign keratosis', 'melanoma', 'vascular lesion',
-        'actinic keratosis', 'squamous cell carcinoma', 'basal cell carcinoma',
-        'seborrheic keratosis', 'dermatofibroma', 'nevus'
-    ][np.argmax(result)]
